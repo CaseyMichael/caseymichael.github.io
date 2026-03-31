@@ -166,10 +166,10 @@ export function build() {
   }
   for (const [tag, tagPosts] of tagMap) {
     const tagHtml = renderTemplate(indexTemplate, {
-      page_title: `${tag} — seekmore.xyz`,
+      page_title: `${tag} — ${SITE_TITLE}`,
       page_heading: `tagged: ${tag}`,
       posts_html: tagPosts.map(renderPostCard).join('\n'),
-      meta_description: `Posts tagged '${tag}' on seekmore.xyz.`,
+      meta_description: `Posts tagged '${tag}' on ${SITE_TITLE}.`,
       canonical_url: `${BASE_URL}/tags/${tag}/`,
       robots_meta: '<meta name="robots" content="noindex, follow">',
     });
