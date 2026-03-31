@@ -2,6 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { generateSlug, estimateReadTime, tagColor } from './build.js';
+import { renderTemplate, renderTagBadge, renderPostCard } from './build.js';
 
 test('generateSlug strips date prefix and .md extension', () => {
   assert.equal(generateSlug('2026-03-15-why-i-switched-to-neovim.md'), 'why-i-switched-to-neovim');
@@ -34,8 +35,6 @@ test('tagColor produces multiple distinct colors across different tag names', ()
   const unique = new Set(colors);
   assert.ok(unique.size > 1, 'expected multiple colors across different tags');
 });
-
-import { renderTemplate, renderTagBadge, renderPostCard } from './build.js';
 
 test('renderTemplate replaces a single token', () => {
   assert.equal(renderTemplate('Hello {{name}}', { name: 'world' }), 'Hello world');
