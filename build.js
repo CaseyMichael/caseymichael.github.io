@@ -143,6 +143,7 @@ export function build() {
       content: post.content,
       meta_description: post.excerpt,
       canonical_url: `${BASE_URL}/posts/${post.slug}/`,
+      site_title: SITE_TITLE,
     });
     writeFile(path.join(DIST_DIR, 'posts', post.slug, 'index.html'), html);
   }
@@ -155,6 +156,7 @@ export function build() {
     meta_description: SITE_DESCRIPTION,
     canonical_url: `${BASE_URL}/`,
     robots_meta: '',
+    site_title: SITE_TITLE,
   });
   writeFile(path.join(DIST_DIR, 'index.html'), homepageHtml);
 
@@ -174,6 +176,7 @@ export function build() {
       meta_description: `Posts tagged '${tag}' on ${SITE_TITLE}.`,
       canonical_url: `${BASE_URL}/tags/${tag}/`,
       robots_meta: '<meta name="robots" content="noindex, follow">',
+      site_title: SITE_TITLE,
     });
     writeFile(path.join(DIST_DIR, 'tags', tag, 'index.html'), tagHtml);
   }
