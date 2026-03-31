@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stop Vibing - How I Actually Use Claude Code — seekmore.xyz</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav>
+    <a href="/" class="site-title">seekmore.xyz</a>
+    <a href="/" class="back-link">← all posts</a>
+  </nav>
+  <main>
+    <article>
+      <div class="tags"><a href="/tags/claude/" class="tag" style="color:#7aa2f7">claude</a><a href="/tags/claude-code/" class="tag" style="color:#7aa2f7">claude-code</a><a href="/tags/ai/" class="tag" style="color:#ff9e64">ai</a></div>
+      <h1 class="post-title">Stop Vibing - How I Actually Use Claude Code</h1>
+      <p class="post-meta">March 31, 2026 · 4 min read</p>
+      <div class="post-content"><h2>The workflow</h2>
+<p>Here is my core workflow in 3 simple steps.</p>
+<ol>
+<li>Pull in context, file pointers, logs, metrics, traces, get Claude familiar with the problem and where the code lives.</li>
+<li>Ask follow up questions, steer the investigation and try to come up with a plan for the changes, or the locate where the root cause of the bug lives.</li>
+<li>Generate next steps, write a doc, ticket or prompt.</li>
+</ol>
+<p>The other day I noticed that we had a background task take 17 minutes to complete, the P99 for this area of our codebase is typically under 2 minutes. So I grabbed the trace id from datadog and asked Claude <code>Hey, can you investigate this trace X using the datadog mcp?</code> Then off to the races while I made some coffee.</p>
+<p>It was able to read all the logs around that trace, pull in the waterfall graphs and due to my setup it was reading the code related to the trace. After a few minutes and a couple follow up questions it was able to identify 6 areas of improvement each around N+1 query issues for a larger customer import. Lastly I asked Claude to write a ticket for each of these issues and assign it to the Performance Improvement Epic in our Jira backlog. I was able to complete this work in 15 minutes.</p>
+<h2>The setup</h2>
+<h3>Claude Rules</h3>
+<p>This seems to be a little known feature of Claude, but I&#39;ve seen consistent adherence to the rules I&#39;ve written. This will need to be specific to your codebase and how you like to write code but please take advantage of these. They are really effective when you&#39;ve setup appropriate paths using the YAML formatter. You can learn more about <a href="https://code.claude.com/docs/en/memory#set-up-rules">rules</a> and I&#39;ve found a few blogs that have some more deep dives into them <a href="https://joseparreogarcia.substack.com/p/how-claude-code-rules-actually-work">How Claude Code rules actually work</a></p>
+<p>For me I&#39;ve setup a basic &quot;workflow&quot; and &quot;testing&quot; rule that do most of the heavy lifting.</p>
+<pre><code># Workflow
+
+- Always write tests before making any changes
+- Always build and typecheck the project when you&#39;ve made code changes
+- Always run tests related to the code changes before you are done
+- Prefer running single tests, and not the whole test suite, for performance
+</code></pre>
+<pre><code># Testing
+
+- Keep all tests simple and minimal
+- Prefer writing parameterized tests over multiple describe / it blocks
+- Repeated test setup code should be abstracted to a shared function
+- Do not make any assertions on log statements
+- Do not write tests that do not add value that simple TS typechecking provides
+</code></pre>
+<h3>MCP servers</h3>
+<p>Recently I&#39;ve experienced a huge benefit from having MCP servers for Jira, Datadog &amp; Notion. Being able to reach for and pull in context from Datadog, especially looking at traces and waterfalls, has made identifying performance issues easier and more efficient. I highly suggest looking into setting up the <a href="https://docs.datadoghq.com/bits_ai/mcp_server/">Datadog</a>, <a href="https://www.atlassian.com/blog/announcements/remote-mcp-server">Jira</a>, and <a href="https://github.com/makenotion/notion-mcp-server">Notion</a> MCP servers — the combination of all three has been a force multiplier for investigation work.</p>
+<h3>Skills</h3>
+<p>I&#39;ve also discovered that Claude has a few plugins and skills that have helped improve my workflow. The &quot;superpowers&quot; plugin kicks off frequently and has been really powerful. Then I found a few others: <code>skill-improver</code> and <code>claude-md-management</code>.</p>
+<p>I&#39;ve used the skill-improver to help generate 3 custom skills — <code>write:doc</code>, <code>write:ticket</code>, <code>write:prompt</code> — each representing the final state of an investigation with Claude:</p>
+<ul>
+<li><strong><code>write:prompt</code></strong> — if I feel I could quickly fix the issue (small bug or simple refactor), I&#39;ll use this and kick off a separate CI process to implement the change</li>
+<li><strong><code>write:ticket</code></strong> — if the work needs more investigation and dedicated sprint time, this leverages the Jira MCP and creates the ticket with all fields filled out</li>
+<li><strong><code>write:doc</code></strong> — if I&#39;m not quite sure what to do next, I&#39;ll write a doc and save it to my <a href="https://obsidian.md">Obsidian</a> vault for future reference</li>
+</ul>
+<h3>CLAUDE.md</h3>
+<p>I&#39;ve used the <code>claude-md-management</code> skill to generate a personal CLAUDE.md file that helps Claude understand the products, features, and keywords I use — with a mapping of where that code lives in our monorepo. This has helped me write more casual prompts without always needing to provide file pointers as references.</p>
+</div>
+    </article>
+  </main>
+</body>
+</html>
