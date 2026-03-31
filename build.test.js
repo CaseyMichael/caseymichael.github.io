@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { generateSlug, estimateReadTime, tagColor } from './build.js';
 import { renderTemplate, renderTagBadge, renderPostCard } from './build.js';
+import { buildSitemapXml } from './build.js';
 
 test('generateSlug strips date prefix and .md extension', () => {
   assert.equal(generateSlug('2026-03-15-why-i-switched-to-neovim.md'), 'why-i-switched-to-neovim');
@@ -69,4 +70,24 @@ test('renderPostCard includes title, excerpt, slug link, and tag link', () => {
   assert.ok(card.includes('A short summary.'));
   assert.ok(card.includes('href="/posts/test-post/"'));
   assert.ok(card.includes('href="/tags/tooling/"'));
+});
+
+test('buildSitemapXml includes homepage URL', () => {
+  const xml = buildSitemapXml(['https://seekmore.xyz/', 'https://seekmore.xyz/posts/hello/']);
+  assert.ok(xml.includes('<loc>https://seekmore.xyz/</loc>'));
+});
+
+test('buildSitemapXml includes all provided URLs', () => {
+  const urls = ['https://seekmore.xyz/', 'https://seekmore.xyz/posts/hello/'];
+  const xml = buildSitemapXml(urls);
+  for (const url of urls) {
+    assert.ok(xml.includes(`<loc>${url}</loc>`), `missing ${url}`);
+  }
+});
+
+test('buildSitemapXml produces valid sitemap envelope', () => {
+  const xml = buildSitemapXml([]);
+  assert.ok(xml.includes('<?xml version="1.0"'));
+  assert.ok(xml.includes('xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'));
+  assert.ok(xml.includes('</urlset>'));
 });

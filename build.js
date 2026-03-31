@@ -95,6 +95,16 @@ export function renderPostCard(post) {
 </div>`;
 }
 
+/**
+ * Builds a sitemap XML string from an array of absolute URLs.
+ */
+export function buildSitemapXml(urls) {
+  const urlEntries = urls
+    .map(url => `  <url>\n    <loc>${url}</loc>\n  </url>`)
+    .join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urlEntries}\n</urlset>`;
+}
+
 const POSTS_DIR = path.join(__dirname, 'posts');
 const DIST_DIR = path.join(__dirname, 'dist');
 const TEMPLATES_DIR = path.join(__dirname, 'templates');
@@ -180,6 +190,14 @@ export function build() {
     });
     writeFile(path.join(DIST_DIR, 'tags', tag, 'index.html'), tagHtml);
   }
+
+  // Build sitemap
+  const allUrls = [
+    `${BASE_URL}/`,
+    ...posts.map(p => `${BASE_URL}/posts/${p.slug}/`),
+    ...[...tagMap.keys()].map(tag => `${BASE_URL}/tags/${tag}/`),
+  ];
+  writeFile(path.join(DIST_DIR, 'sitemap.xml'), buildSitemapXml(allUrls));
 
   console.log(`Built ${posts.length} post(s), ${tagMap.size} tag page(s).`);
 }
