@@ -1,9 +1,7 @@
 // build.test.js
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { generateSlug, estimateReadTime, tagColor } from './build.js';
-import { renderTemplate, renderTagBadge, renderPostCard } from './build.js';
-import { buildSitemapXml } from './build.js';
+import { generateSlug, estimateReadTime, tagColor, renderTemplate, renderTagBadge, renderPostCard, buildSitemapXml } from './build.js';
 
 test('generateSlug strips date prefix and .md extension', () => {
   assert.equal(generateSlug('2026-03-15-why-i-switched-to-neovim.md'), 'why-i-switched-to-neovim');
