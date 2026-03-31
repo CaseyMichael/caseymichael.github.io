@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>seekmore.xyz</title>
+    <link>https://seekmore.xyz/</link>
+    <description>Notes on tools, terminal setups, and the craft of software.</description>
+    <item>
+      <title>Stop Vibing - How I Actually Use Claude Code</title>
+      <link>https://seekmore.xyz/posts/stop-vibing/</link>
+      <description>How I leverage AI to quickly investigate issues for my team</description>
+      <pubDate>Tue, 31 Mar 2026 00:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Hello World</title>
+      <link>https://seekmore.xyz/posts/hello-world/</link>
+      <description>The obligatory first post — what this blog is, why I started it, and what to expect.</description>
+      <pubDate>Tue, 31 Mar 2026 00:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
