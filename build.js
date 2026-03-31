@@ -90,3 +90,81 @@ export function renderPostCard(post) {
   <div class="tags">${tagsHtml}</div>
 </div>`;
 }
+
+const POSTS_DIR = path.join(__dirname, 'posts');
+const DIST_DIR = path.join(__dirname, 'dist');
+const TEMPLATES_DIR = path.join(__dirname, 'templates');
+const CSS_DIR = path.join(__dirname, 'css');
+
+function readTemplate(name) {
+  return fs.readFileSync(path.join(TEMPLATES_DIR, name), 'utf8');
+}
+
+function writeFile(filepath, content) {
+  fs.mkdirSync(path.dirname(filepath), { recursive: true });
+  fs.writeFileSync(filepath, content, 'utf8');
+}
+
+export function build() {
+  console.log('Building...');
+
+  // Clean and recreate dist
+  fs.rmSync(DIST_DIR, { recursive: true, force: true });
+  fs.mkdirSync(DIST_DIR, { recursive: true });
+
+  // Copy CSS
+  const cssDest = path.join(DIST_DIR, 'css');
+  fs.mkdirSync(cssDest, { recursive: true });
+  fs.copyFileSync(path.join(CSS_DIR, 'style.css'), path.join(cssDest, 'style.css'));
+
+  const indexTemplate = readTemplate('index.html');
+  const postTemplate = readTemplate('post.html');
+
+  // Parse all posts — newest first
+  const postFiles = fs.readdirSync(POSTS_DIR)
+    .filter(f => f.endsWith('.md'))
+    .sort()
+    .reverse();
+
+  const posts = postFiles.map(f => parsePost(path.join(POSTS_DIR, f)));
+
+  // Build individual post pages
+  for (const post of posts) {
+    const tagsHtml = post.tags.map(renderTagBadge).join('');
+    const html = renderTemplate(postTemplate, {
+      title: post.title,
+      date: post.date,
+      read_time: post.readTime,
+      tags_html: tagsHtml,
+      content: post.content,
+    });
+    writeFile(path.join(DIST_DIR, 'posts', post.slug, 'index.html'), html);
+  }
+
+  // Build homepage
+  const homepageHtml = renderTemplate(indexTemplate, {
+    page_title: 'seekmore.xyz',
+    page_heading: 'all posts',
+    posts_html: posts.map(renderPostCard).join('\n'),
+  });
+  writeFile(path.join(DIST_DIR, 'index.html'), homepageHtml);
+
+  // Build tag pages
+  const tagMap = new Map();
+  for (const post of posts) {
+    for (const tag of post.tags) {
+      if (!tagMap.has(tag)) tagMap.set(tag, []);
+      tagMap.get(tag).push(post);
+    }
+  }
+  for (const [tag, tagPosts] of tagMap) {
+    const tagHtml = renderTemplate(indexTemplate, {
+      page_title: `${tag} — seekmore.xyz`,
+      page_heading: `tagged: ${tag}`,
+      posts_html: tagPosts.map(renderPostCard).join('\n'),
+    });
+    writeFile(path.join(DIST_DIR, 'tags', tag, 'index.html'), tagHtml);
+  }
+
+  console.log(`Built ${posts.length} post(s), ${tagMap.size} tag page(s).`);
+}
