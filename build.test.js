@@ -1,7 +1,7 @@
 // build.test.js
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { generateSlug, estimateReadTime, tagColor, renderTemplate, renderTagBadge, renderPostCard, buildSitemapXml } from './build.js';
+import { generateSlug, estimateReadTime, tagColor, renderTemplate, renderTagBadge, renderPostCard, buildSitemapXml, buildRssFeed } from './build.js';
 
 test('generateSlug strips date prefix and .md extension', () => {
   assert.equal(generateSlug('2026-03-15-why-i-switched-to-neovim.md'), 'why-i-switched-to-neovim');
@@ -88,4 +88,28 @@ test('buildSitemapXml produces valid sitemap envelope', () => {
   assert.ok(xml.includes('<?xml version="1.0"'));
   assert.ok(xml.includes('xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'));
   assert.ok(xml.includes('</urlset>'));
+});
+
+test('buildRssFeed includes channel title and link', () => {
+  const xml = buildRssFeed([]);
+  assert.ok(xml.includes('<title>seekmore.xyz</title>'));
+  assert.ok(xml.includes('<link>https://seekmore.xyz/</link>'));
+});
+
+test('buildRssFeed includes item for each post', () => {
+  const posts = [
+    { title: 'Hello World', slug: 'hello-world', excerpt: 'Intro post.', date: 'March 31, 2026' },
+  ];
+  const xml = buildRssFeed(posts);
+  assert.ok(xml.includes('<title>Hello World</title>'));
+  assert.ok(xml.includes('<link>https://seekmore.xyz/posts/hello-world/</link>'));
+  assert.ok(xml.includes('<description>Intro post.</description>'));
+});
+
+test('buildRssFeed produces valid RSS envelope', () => {
+  const xml = buildRssFeed([]);
+  assert.ok(xml.includes('<?xml version="1.0"'));
+  assert.ok(xml.includes('<rss version="2.0"'));
+  assert.ok(xml.includes('</channel>'));
+  assert.ok(xml.includes('</rss>'));
 });

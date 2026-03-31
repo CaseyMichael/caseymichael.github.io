@@ -105,6 +105,36 @@ export function buildSitemapXml(urls) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urlEntries}\n</urlset>`;
 }
 
+/**
+ * Builds an RSS 2.0 feed XML string from an array of post objects.
+ * Each post needs: { title, slug, excerpt, date }
+ */
+export function buildRssFeed(posts) {
+  const items = posts.map(post => {
+    const pubDate = post.date ? new Date(post.date).toUTCString() : '';
+    return [
+      '    <item>',
+      `      <title>${post.title}</title>`,
+      `      <link>${BASE_URL}/posts/${post.slug}/</link>`,
+      `      <description>${post.excerpt}</description>`,
+      pubDate ? `      <pubDate>${pubDate}</pubDate>` : '',
+      '    </item>',
+    ].filter(Boolean).join('\n');
+  }).join('\n');
+
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<rss version="2.0">',
+    '  <channel>',
+    `    <title>${SITE_TITLE}</title>`,
+    `    <link>${BASE_URL}/</link>`,
+    `    <description>${SITE_DESCRIPTION}</description>`,
+    items,
+    '  </channel>',
+    '</rss>',
+  ].join('\n');
+}
+
 const POSTS_DIR = path.join(__dirname, 'posts');
 const DIST_DIR = path.join(__dirname, 'dist');
 const TEMPLATES_DIR = path.join(__dirname, 'templates');
@@ -198,6 +228,9 @@ export function build() {
     ...[...tagMap.keys()].map(tag => `${BASE_URL}/tags/${tag}/`),
   ];
   writeFile(path.join(DIST_DIR, 'sitemap.xml'), buildSitemapXml(allUrls));
+
+  // Build RSS feed
+  writeFile(path.join(DIST_DIR, 'feed.xml'), buildRssFeed(posts));
 
   console.log(`Built ${posts.length} post(s), ${tagMap.size} tag page(s).`);
 }
