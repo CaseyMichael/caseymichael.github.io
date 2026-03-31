@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{page_title}}</title>
+  <meta name="description" content="{{meta_description}}">
+  {{robots_meta}}
+  <meta property="og:title" content="{{page_title}}">
+  <meta property="og:description" content="{{meta_description}}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{canonical_url}}">
+  <meta name="twitter:card" content="summary">
+  <link rel="canonical" href="{{canonical_url}}">
+  <link rel="alternate" type="application/rss+xml" title="seekmore.xyz" href="/feed.xml">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -11,7 +20,7 @@
     <a href="/" class="site-title">seekmore.xyz</a>
   </nav>
   <main>
-    <p class="page-heading">{{page_heading}}</p>
+    <h1 class="page-heading">{{page_heading}}</h1>
     {{posts_html}}
   </main>
 </body>

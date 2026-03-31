@@ -10,6 +10,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const TAG_COLORS = ['#7aa2f7', '#7dcfff', '#9ece6a', '#bb9af7', '#ff9e64', '#e0af68'];
 
+const BASE_URL = 'https://seekmore.xyz';
+const SITE_TITLE = 'seekmore.xyz';
+const SITE_DESCRIPTION = 'Notes on tools, terminal setups, and the craft of software.';
+
 /**
  * Derives a URL slug from a post filename.
  * "2026-03-15-why-i-switched-to-neovim.md" → "why-i-switched-to-neovim"
@@ -143,9 +147,12 @@ export function build() {
 
   // Build homepage
   const homepageHtml = renderTemplate(indexTemplate, {
-    page_title: 'seekmore.xyz',
+    page_title: SITE_TITLE,
     page_heading: 'all posts',
     posts_html: posts.map(renderPostCard).join('\n'),
+    meta_description: SITE_DESCRIPTION,
+    canonical_url: `${BASE_URL}/`,
+    robots_meta: '',
   });
   writeFile(path.join(DIST_DIR, 'index.html'), homepageHtml);
 
@@ -162,6 +169,9 @@ export function build() {
       page_title: `${tag} — seekmore.xyz`,
       page_heading: `tagged: ${tag}`,
       posts_html: tagPosts.map(renderPostCard).join('\n'),
+      meta_description: `Posts tagged '${tag}' on seekmore.xyz.`,
+      canonical_url: `${BASE_URL}/tags/${tag}/`,
+      robots_meta: '<meta name="robots" content="noindex, follow">',
     });
     writeFile(path.join(DIST_DIR, 'tags', tag, 'index.html'), tagHtml);
   }
