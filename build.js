@@ -141,6 +141,8 @@ export function build() {
       read_time: post.readTime,
       tags_html: tagsHtml,
       content: post.content,
+      meta_description: post.excerpt,
+      canonical_url: `${BASE_URL}/posts/${post.slug}/`,
     });
     writeFile(path.join(DIST_DIR, 'posts', post.slug, 'index.html'), html);
   }
