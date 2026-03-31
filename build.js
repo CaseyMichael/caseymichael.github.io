@@ -59,3 +59,34 @@ export function parsePost(filepath) {
     content: marked.parse(content),
   };
 }
+
+/**
+ * Replaces all {{key}} tokens in a template string with values from vars.
+ */
+export function renderTemplate(template, vars) {
+  return Object.entries(vars).reduce(
+    (html, [key, value]) => html.replaceAll(`{{${key}}}`, value),
+    template,
+  );
+}
+
+/**
+ * Renders a single tag as a linked pill badge.
+ */
+export function renderTagBadge(tag) {
+  const color = tagColor(tag);
+  return `<a href="/tags/${tag}/" class="tag" style="color:${color}">${tag}</a>`;
+}
+
+/**
+ * Renders a post card for use on the index or tag page.
+ */
+export function renderPostCard(post) {
+  const tagsHtml = post.tags.map(renderTagBadge).join('');
+  return `<div class="post-card">
+  <p class="post-card-meta">${post.date} · ${post.readTime}</p>
+  <a href="/posts/${post.slug}/" class="post-card-title">${post.title}</a>
+  <p class="post-card-excerpt">${post.excerpt}</p>
+  <div class="tags">${tagsHtml}</div>
+</div>`;
+}
