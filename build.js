@@ -168,3 +168,64 @@ export function build() {
 
   console.log(`Built ${posts.length} post(s), ${tagMap.size} tag page(s).`);
 }
+
+function startDevServer(port = 3000) {
+  const mimeTypes = {
+    '.html': 'text/html',
+    '.css': 'text/css',
+    '.js': 'text/javascript',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.svg': 'image/svg+xml',
+  };
+
+  createServer((req, res) => {
+    let urlPath = req.url === '/' ? '/index.html' : req.url;
+    // Support clean URLs: /posts/my-post/ → /posts/my-post/index.html
+    if (!path.extname(urlPath)) {
+      urlPath = urlPath.replace(/\/?$/, '/index.html');
+    }
+    const filePath = path.join(DIST_DIR, urlPath);
+    const ext = path.extname(filePath);
+    const contentType = mimeTypes[ext] ?? 'text/plain';
+    try {
+      const content = fs.readFileSync(filePath);
+      res.writeHead(200, { 'Content-Type': contentType });
+      res.end(content);
+    } catch {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Not found');
+    }
+  }).listen(port, () => {
+    console.log(`Dev server: http://localhost:${port}`);
+  });
+}
+
+function watch() {
+  build();
+  startDevServer();
+
+  const watchDirs = [POSTS_DIR, TEMPLATES_DIR, CSS_DIR];
+  for (const dir of watchDirs) {
+    fs.watch(dir, { recursive: false }, (_event, filename) => {
+      if (!filename) return;
+      console.log(`Changed: ${filename} — rebuilding...`);
+      try {
+        build();
+      } catch (err) {
+        console.error('Build error:', err.message);
+      }
+    });
+  }
+
+  console.log(`Watching ${watchDirs.map(d => path.relative(__dirname, d)).join(', ')}...`);
+}
+
+// CLI entry point — only runs when executed directly (not when imported by tests)
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  if (process.argv.includes('--watch')) {
+    watch();
+  } else {
+    build();
+  }
+}
