@@ -232,8 +232,8 @@ export function build() {
   // Build RSS feed
   writeFile(path.join(DIST_DIR, 'feed.xml'), buildRssFeed(posts));
 
-  // Write _headers to ensure XML files are served with correct Content-Type for Google
-  writeFile(path.join(DIST_DIR, '_headers'), '/*.xml\n  Content-Type: text/xml; charset=utf-8\n');
+  // Build robots.txt
+  writeFile(path.join(DIST_DIR, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}/sitemap.xml\n`);
 
   console.log(`Built ${posts.length} post(s), ${tagMap.size} tag page(s).`);
 }
