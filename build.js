@@ -232,6 +232,9 @@ export function build() {
   // Build RSS feed
   writeFile(path.join(DIST_DIR, 'feed.xml'), buildRssFeed(posts));
 
+  // Write _headers to ensure XML files are served with correct Content-Type for Google
+  writeFile(path.join(DIST_DIR, '_headers'), '/*.xml\n  Content-Type: text/xml; charset=utf-8\n');
+
   console.log(`Built ${posts.length} post(s), ${tagMap.size} tag page(s).`);
 }
 
@@ -243,6 +246,7 @@ function startDevServer(port = 3000) {
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
     '.svg': 'image/svg+xml',
+    '.xml': 'text/xml',
   };
 
   createServer((req, res) => {
